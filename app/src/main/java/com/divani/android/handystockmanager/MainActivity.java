@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity
 
         //creating fragment object
         Fragment fragment = null;
-        Class fragmentClass = null;
+        Class fragmentClass;
 
         //initializing the fragment object which is selected
         switch (itemId) {
