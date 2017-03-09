@@ -8,6 +8,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
+
+import java.util.zip.Inflater;
 
 
 /**
@@ -18,7 +22,7 @@ import android.view.ViewGroup;
  * Use the {@link AddFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AddFragment extends Fragment {
+public class AddFragment extends Fragment implements View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -27,6 +31,9 @@ public class AddFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    // Button object
+    Button addEntry;
 
     private OnFragmentInteractionListener mListener;
 
@@ -72,6 +79,9 @@ public class AddFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
+        addEntry = (Button)inflater.inflate(R.layout.fragment_add, container, false).findViewById(R.id.submit_product_btn);
+        addEntry.setOnClickListener(this);
         return inflater.inflate(R.layout.fragment_add, container, false);
     }
 
@@ -97,6 +107,14 @@ public class AddFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        if(v.getId() == R.id.submit_product_btn) {
+            System.out.println("Button Clicked");
+        }
     }
 
     /**
