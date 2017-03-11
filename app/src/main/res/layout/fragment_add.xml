@@ -64,7 +64,7 @@
             android:layout_marginTop="16dp"
             android:ems="10"
             android:hint="@string/price"
-            android:inputType="textPersonName"
+            android:inputType="number"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/model_number_txt"
             android:layout_marginLeft="0dp"

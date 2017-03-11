@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.zip.Inflater;
@@ -88,7 +89,8 @@ public class AddFragment extends Fragment {
             @Override
             public void onClick(View InputFragmentView)
             {
-                Toast.makeText(getActivity().getApplicationContext(), "Entry added!", Toast.LENGTH_LONG).show();
+                if(checkFields())
+                    Toast.makeText(getActivity().getApplicationContext(), "Entry added!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -132,5 +134,42 @@ public class AddFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    public boolean checkFields(){
+
+        EditText product_type = (EditText) getView().findViewById(R.id.product_type_txt);
+        EditText brand = (EditText) getView().findViewById(R.id.brand_name_txt);
+        EditText model_number = (EditText) getView().findViewById(R.id.model_number_txt);
+        EditText price = (EditText) getView().findViewById(R.id.price_txt);
+
+        String product_txt = product_type.getText().toString().trim();
+        String brand_txt = product_type.getText().toString().trim();
+        String model_txt = product_type.getText().toString().trim();
+        String price_txt = product_type.getText().toString().trim();
+
+        if(product_txt.isEmpty() || product_txt.length() == 0 || product_txt.equals("") || product_txt == null)
+        {
+            Toast.makeText(getActivity().getApplicationContext(), "Please enter a product type", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        else if(brand_txt.isEmpty() || brand_txt.length() == 0 || brand_txt.equals("") || brand_txt == null){
+
+            Toast.makeText(getActivity().getApplicationContext(), "Please enter a brand", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        else if(model_txt.isEmpty() || model_txt.length() == 0 || model_txt.equals("") || brand_txt == null){
+
+            Toast.makeText(getActivity().getApplicationContext(), "Please enter a model number", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        else if(price_txt.isEmpty() || price_txt.length() == 0 || price_txt.equals("") || brand_txt == null){
+
+            Toast.makeText(getActivity().getApplicationContext(), "Please enter a price", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
+
     }
 }
