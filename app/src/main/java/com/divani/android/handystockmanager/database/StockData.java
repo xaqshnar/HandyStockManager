@@ -24,6 +24,11 @@ public class StockData extends SQLiteOpenHelper {
                     Product_Type.COLUMN_NAME_PRODUCT_TYPE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     Product_Type.COLUMN_NAME_PRODUCT_TYPE_NAME + " TEXT NOT NULL)";
 
+    private static final String SQL_CREATE_ENTRIES_BRAND =
+            "CREATE TABLE IF NOT EXISTS " + Brand.TABLE_NAME + " (" +
+                    Brand.COLUMN_NAME_BRAND_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    Brand.COLUMN_NAME_BRAND_NAME + " TEXT NOT NULL)";
+
     private static final String SQL_CREATE_ENTRIES_PRODUCTS =
             "CREATE TABLE IF NOT EXISTS " + Products.TABLE_NAME + " (" +
                     Products.COLUMN_NAME_PRODUCT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +

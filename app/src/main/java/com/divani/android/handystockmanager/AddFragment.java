@@ -1,10 +1,12 @@
 package com.divani.android.handystockmanager;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +27,7 @@ import com.divani.android.handystockmanager.database.StockData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.Inflater;
 
 
 /**
@@ -91,7 +94,7 @@ public class AddFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
@@ -120,7 +123,9 @@ public class AddFragment extends Fragment {
             @Override
             public void onClick(View InputFragmentView)
             {
-                    Toast.makeText(getActivity().getApplicationContext(), "Testing!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity().getApplicationContext(), "Testing!", Toast.LENGTH_SHORT).show();
+                Log.d("Adding: ", "Adding product entry to database");
+                showDialog(inflater);
             }
         });
 
@@ -185,6 +190,8 @@ public class AddFragment extends Fragment {
         String model_txt = model_number.getText().toString().trim();
         String price_txt = price.getText().toString().trim();
 
+        int prod_type_index = product_type.getSelectedItemPosition();
+
         if(product_txt.isEmpty() || product_txt.length() == 0 || product_txt.equals("") || product_txt == null || product_txt.equals("Select"))
         {
             Toast.makeText(getActivity().getApplicationContext(), "Please select a product type", Toast.LENGTH_SHORT).show();
@@ -205,6 +212,12 @@ public class AddFragment extends Fragment {
             Toast.makeText(getActivity().getApplicationContext(), "Please enter a price", Toast.LENGTH_SHORT).show();
             return false;
         }
+
+        /*------------------Adding entry to database----------------*/
+
+
+        Products p = new Products(prod_type_index, brand_txt, model_txt, price_txt);
+        dbHelper.addProducts(p);
 
         return true;
     }
@@ -275,5 +288,35 @@ public class AddFragment extends Fragment {
             e.setAdapter(adapter);
         }
 
+    }
+
+    public void showDialog(LayoutInflater inflater) {
+
+        final View DIALOG_VIEW = inflater.inflate(R.layout.add_product_dialog, null);
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+        alertDialog.setTitle("Add new product type");
+        alertDialog.setIcon(R.drawable.ic_menu_add);
+        alertDialog.setView(DIALOG_VIEW);
+        alertDialog.show();
+
+        Button add = (Button) DIALOG_VIEW.findViewById(R.id.new_product_type_button);
+
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EditText prod_type = (EditText) DIALOG_VIEW.findViewById(R.id.new_product_type_txt);
+                String prod_type_txt = prod_type.getText().toString().trim();
+
+                if(prod_type_txt != null || !prod_type_txt.equals("") || prod_type_txt.length() != 0) {
+
+                    Product_Type product_type = new Product_Type(0 ,prod_type_txt);
+                    dbHelper.getWritableDatabase();
+                    dbHelper.addProduct_Type(product_type);
+
+                }else {
+                    Toast.makeText(DIALOG_VIEW.getContext(), "Enter product type", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }
