@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,12 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.divani.android.handystockmanager.custom.SpinAdapter;
+import com.divani.android.handystockmanager.database.Product_Type;
+import com.divani.android.handystockmanager.database.StockData;
+
+import java.util.List;
 
 
 /**
@@ -40,6 +47,8 @@ public class AddFragment extends Fragment {
     Button addEntry, addNewProduct;
 
     private OnFragmentInteractionListener mListener;
+
+    private StockData dbHelper;
 
     public AddFragment() {
         // Required empty public constructor
@@ -90,6 +99,7 @@ public class AddFragment extends Fragment {
         addNewProduct = (Button) v.findViewById(R.id.add_new_product_btn);
 
         /* Initializations */
+        openConnection();
         setValuesForProductSpinner(v);
         setValuesForBrand(v);
         setValuesForModel(v);
@@ -116,6 +126,13 @@ public class AddFragment extends Fragment {
 
         return v;
     }
+
+    public void openConnection() {
+
+        Log.d("Opening: ", "Opening connection for new products ..");
+        dbHelper = StockData.getInstance(getActivity());
+    }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -192,23 +209,28 @@ public class AddFragment extends Fragment {
         return true;
     }
 
+    private SpinAdapter adapter;
+
     public void setValuesForProductSpinner(View v) {
 
-        //Dummy values for testing----------
-        String [] values =
-                {"Select", "Mobile", "Television", "Laptop", "Tablet", "Air Conditioner"};
-        //-----------------------------------
-        //TODO: Get actual drop down values from database
+        //Get all values from database
+        Product_Type[] p = dbHelper.getAllProduct_TypeArr();
 
         Spinner spinner = (Spinner) v.findViewById(R.id.productType);
+
+        adapter = new SpinAdapter(this.getActivity(), android.R.layout.simple_spinner_item, p);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+        spinner.setAdapter(adapter);
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
-            public void onItemSelected(AdapterView<?> parent, View arg1, int arg2, long arg3)
+            public void onItemSelected(AdapterView<?> parent, View arg1, int position, long id)
             {
-                //((TextView) parent.getChildAt(0)).setTextColor(getResources().getColor(R.color.white));
-                ((TextView) parent.getChildAt(0)).setTextSize(18);
+                //get the current item that is selected by its position
+                Product_Type p = adapter.getItem(position);
+                //do whatever you want with it
             }
 
             @Override
@@ -216,11 +238,6 @@ public class AddFragment extends Fragment {
 
             }
         });
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.select_dialog_item, values);
-        adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-        spinner.setAdapter(adapter);
-
     }
 
     public void setValuesForBrand(View v) {
