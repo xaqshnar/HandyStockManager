@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity
 
         //create the database
         openConnection();
-        insertDummyData();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -137,14 +136,5 @@ public class MainActivity extends AppCompatActivity
         dbHelper = StockData.getInstance(this);
     }
 
-    public void insertDummyData() {
-
-        //insert dummy values
-        Log.d("Inserting: ", "Inserting data ..");
-        dbHelper.addProduct_Type(new Product_Type("Mobile"));
-        dbHelper.addProduct_Type(new Product_Type("TV"));
-        dbHelper.addProduct_Type(new Product_Type("Laptop"));
-        dbHelper.addProduct_Type(new Product_Type("Tablet"));
-    }
 
 }

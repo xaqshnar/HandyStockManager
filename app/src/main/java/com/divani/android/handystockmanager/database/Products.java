@@ -54,4 +54,17 @@ public class Products {
     public void setPrice(String price) {
         this.price = price;
     }
+
+    public Products() {
+
+    }
+
+    public Products(int p_id, String brand_name, String model_name, String price) {
+
+        this.p_id = p_id;
+        this.brand_name = brand_name;
+        this.model_name =  model_name;
+        this.price = price;
+
+    }
 }

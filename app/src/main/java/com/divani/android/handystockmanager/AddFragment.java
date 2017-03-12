@@ -20,8 +20,10 @@ import android.widget.Toast;
 
 import com.divani.android.handystockmanager.custom.SpinAdapter;
 import com.divani.android.handystockmanager.database.Product_Type;
+import com.divani.android.handystockmanager.database.Products;
 import com.divani.android.handystockmanager.database.StockData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -100,9 +102,7 @@ public class AddFragment extends Fragment {
 
         /* Initializations */
         openConnection();
-        setValuesForProductSpinner(v);
-        setValuesForBrand(v);
-        setValuesForModel(v);
+        setAllFields(v);
 
         /* Listeners */
         addEntry.setOnClickListener(new View.OnClickListener()
@@ -209,6 +209,14 @@ public class AddFragment extends Fragment {
         return true;
     }
 
+    public void setAllFields(View v) {
+
+        setValuesForProductSpinner(v);
+
+        setValuesForBrand(v);
+        setValuesForModel(v);
+    }
+
     private SpinAdapter adapter;
 
     public void setValuesForProductSpinner(View v) {
@@ -216,57 +224,56 @@ public class AddFragment extends Fragment {
         //Get all values from database
         Product_Type[] p = dbHelper.getAllProduct_TypeArr();
 
-        Spinner spinner = (Spinner) v.findViewById(R.id.productType);
+        if(p !=null && p.length > 0) {
 
-        adapter = new SpinAdapter(this.getActivity(), android.R.layout.simple_spinner_item, p);
+            Spinner spinner = (Spinner) v.findViewById(R.id.productType);
 
-        adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-        spinner.setAdapter(adapter);
+            adapter = new SpinAdapter(this.getActivity(), android.R.layout.simple_spinner_item, p);
 
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+            spinner.setAdapter(adapter);
 
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View arg1, int position, long id)
-            {
-                //get the current item that is selected by its position
-                Product_Type p = adapter.getItem(position);
-                //do whatever you want with it
-            }
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View arg1, int position, long id) {
+                    //get the current item that is selected by its position
+                    Product_Type p = adapter.getItem(position);
+                    //do whatever you want with it
+                }
 
-            }
-        });
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+        }
     }
 
     public void setValuesForBrand(View v) {
 
-        //Dummy values for testing----------
-        String [] values =
-                {"Samsung", "LG", "Micromax", "OnePlus", "Google", "Huawei"};
-        //-----------------------------------
-        //TODO: Get actual drop down values from database
+        String[] values = dbHelper.getDistinctData(Products.COLUMN_NAME_BRAND, Products.TABLE_NAME);
 
-        AutoCompleteTextView e = (AutoCompleteTextView) v.findViewById(R.id.brand_name_txt);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.select_dialog_item, values);
-        e.setThreshold(1);
-        e.setAdapter(adapter);
+        if(values != null && values.length > 0){
 
+            AutoCompleteTextView e = (AutoCompleteTextView) v.findViewById(R.id.brand_name_txt);
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.select_dialog_item, values);
+            e.setThreshold(1);
+            e.setAdapter(adapter);
+        }
     }
 
     public void setValuesForModel(View v) {
 
-        //Dummy values for testing----------
-        String [] values =
-                {"Galaxy Note", "Redmi Note 3", "Mate 9", "Canvas", "Pixel", "Nexus"};
-        //-----------------------------------
-        //TODO: Get actual drop down values from database
+        String[] values = dbHelper.getDistinctData(Products.COLUMN_NAME_MODEL, Products.TABLE_NAME);
 
-        AutoCompleteTextView e = (AutoCompleteTextView) v.findViewById(R.id.model_number_txt);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.select_dialog_item, values);
-        e.setThreshold(1);
-        e.setAdapter(adapter);
+        if(values != null && values.length > 0) {
+
+            AutoCompleteTextView e = (AutoCompleteTextView) v.findViewById(R.id.model_number_txt);
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.select_dialog_item, values);
+            e.setThreshold(1);
+            e.setAdapter(adapter);
+        }
 
     }
 }
