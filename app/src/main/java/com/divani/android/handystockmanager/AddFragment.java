@@ -8,12 +8,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.zip.Inflater;
 
 
 /**
@@ -35,7 +37,7 @@ public class AddFragment extends Fragment {
     private String mParam2;
 
     // Button object
-    Button addEntry;
+    Button addEntry, addNewProduct;
 
     private OnFragmentInteractionListener mListener;
 
@@ -82,9 +84,17 @@ public class AddFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
-        View InputFragmentView = inflater.inflate(R.layout.fragment_add, container, false);
-        addEntry = (Button) InputFragmentView.findViewById(R.id.submit_product_btn);
+        View v = inflater.inflate(R.layout.fragment_add, container, false);
 
+        addEntry = (Button) v.findViewById(R.id.submit_product_btn);
+        addNewProduct = (Button) v.findViewById(R.id.add_new_product_btn);
+
+        /* Initializations */
+        setValuesForProductSpinner(v);
+        setValuesForBrand(v);
+        setValuesForModel(v);
+
+        /* Listeners */
         addEntry.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -95,7 +105,16 @@ public class AddFragment extends Fragment {
             }
         });
 
-        return InputFragmentView;
+        addNewProduct.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View InputFragmentView)
+            {
+                    Toast.makeText(getActivity().getApplicationContext(), "Testing!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        return v;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -140,18 +159,18 @@ public class AddFragment extends Fragment {
     public boolean checkFields(){
 
         Spinner product_type = (Spinner) getView().findViewById(R.id.productType);
-        Spinner brand = (Spinner) getView().findViewById(R.id.brandName);
-        Spinner model_number = (Spinner) getView().findViewById(R.id.modelName);
-        EditText price = (EditText) getView().findViewById(R.id.priceTxt);
+        AutoCompleteTextView brand = (AutoCompleteTextView) getView().findViewById(R.id.brand_name_txt);
+        AutoCompleteTextView model_number = (AutoCompleteTextView) getView().findViewById(R.id.model_number_txt);
+        EditText price = (EditText) getView().findViewById(R.id.price_txt);
 
         String product_txt = product_type.getSelectedItem().toString();
-        String brand_txt = brand.getSelectedItem().toString();
-        String model_txt = model_number.getSelectedItem().toString();
+        String brand_txt = brand.getText().toString().trim();
+        String model_txt = model_number.getText().toString().trim();
         String price_txt = price.getText().toString().trim();
 
-        if(product_txt.isEmpty() || product_txt.length() == 0 || product_txt.equals("") || product_txt == null)
+        if(product_txt.isEmpty() || product_txt.length() == 0 || product_txt.equals("") || product_txt == null || product_txt.equals("Select"))
         {
-            Toast.makeText(getActivity().getApplicationContext(), "Please enter a product type", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity().getApplicationContext(), "Please select a product type", Toast.LENGTH_SHORT).show();
             return false;
         }
         else if(brand_txt.isEmpty() || brand_txt.length() == 0 || brand_txt.equals("") || brand_txt == null){
@@ -171,6 +190,66 @@ public class AddFragment extends Fragment {
         }
 
         return true;
+    }
+
+    public void setValuesForProductSpinner(View v) {
+
+        //Dummy values for testing----------
+        String [] values =
+                {"Select", "Mobile", "Television", "Laptop", "Tablet", "Air Conditioner"};
+        //-----------------------------------
+        //TODO: Get actual drop down values from database
+
+        Spinner spinner = (Spinner) v.findViewById(R.id.productType);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View arg1, int arg2, long arg3)
+            {
+                //((TextView) parent.getChildAt(0)).setTextColor(getResources().getColor(R.color.white));
+                ((TextView) parent.getChildAt(0)).setTextSize(18);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.select_dialog_item, values);
+        adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+        spinner.setAdapter(adapter);
+
+    }
+
+    public void setValuesForBrand(View v) {
+
+        //Dummy values for testing----------
+        String [] values =
+                {"Samsung", "LG", "Micromax", "OnePlus", "Google", "Huawei"};
+        //-----------------------------------
+        //TODO: Get actual drop down values from database
+
+        AutoCompleteTextView e = (AutoCompleteTextView) v.findViewById(R.id.brand_name_txt);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.select_dialog_item, values);
+        e.setThreshold(1);
+        e.setAdapter(adapter);
+
+    }
+
+    public void setValuesForModel(View v) {
+
+        //Dummy values for testing----------
+        String [] values =
+                {"Galaxy Note", "Redmi Note 3", "Mate 9", "Canvas", "Pixel", "Nexus"};
+        //-----------------------------------
+        //TODO: Get actual drop down values from database
+
+        AutoCompleteTextView e = (AutoCompleteTextView) v.findViewById(R.id.model_number_txt);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.select_dialog_item, values);
+        e.setThreshold(1);
+        e.setAdapter(adapter);
 
     }
 }

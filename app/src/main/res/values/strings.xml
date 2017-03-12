@@ -12,6 +12,9 @@
     <string name="model_number">Model Number</string>
     <string name="price">Price</string>
     <string name="submit_product">Submit</string>
+    <string name="add_new_product">+</string>
+    <string name="new_product">Enter new product type</string>
+
 
     <!-- TODO: Remove or change this placeholder text -->
 </resources>
