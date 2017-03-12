@@ -144,9 +144,9 @@ public class AddFragment extends Fragment {
         EditText price = (EditText) getView().findViewById(R.id.price_txt);
 
         String product_txt = product_type.getText().toString().trim();
-        String brand_txt = product_type.getText().toString().trim();
-        String model_txt = product_type.getText().toString().trim();
-        String price_txt = product_type.getText().toString().trim();
+        String brand_txt = brand.getText().toString().trim();
+        String model_txt = model_number.getText().toString().trim();
+        String price_txt = price.getText().toString().trim();
 
         if(product_txt.isEmpty() || product_txt.length() == 0 || product_txt.equals("") || product_txt == null)
         {

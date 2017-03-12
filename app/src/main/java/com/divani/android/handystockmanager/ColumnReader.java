@@ -22,7 +22,15 @@ public final class ColumnReader {
         public static final String TABLE_NAME = "brandType";
         public static final String COLUMN_NAME_BRAND_ID = "brand_id";
         public static final String COLUMN_NAME_BRAND_NAME = "brand_name";
-        public static final String COLUMN_NAME_PRODUCT_ID = "brand_name";
+        public static final String COLUMN_NAME_PRODUCT_ID = "product_id";
+    }
+
+    public static class Model implements BaseColumns {
+
+        public static final String TABLE_NAME = "modelDetails";
+        public static final String COLUMN_NAME_MODEL_ID = "moddel_id";
+        public static final String COLUMN_NAME_MODEL_NAME = "model_name";
+        public static final String COLUMN_NAME_MODEL_NUMBER = "model_number";
     }
 
 

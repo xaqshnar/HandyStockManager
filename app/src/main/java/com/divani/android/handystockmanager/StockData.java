@@ -20,7 +20,19 @@ public class StockData extends SQLiteOpenHelper {
                     ColumnReader.Brand.COLUMN_NAME_BRAND_NAME + " TEXT," +
                     ColumnReader.Brand.COLUMN_NAME_PRODUCT_ID + " INT, " +
                     "FOREIGN KEY ("+ColumnReader.Brand.COLUMN_NAME_PRODUCT_ID+ ") REFERENCES"+
-                    ColumnReader.ProductType.TABLE_NAME + "("+ColumnReader.ProductType._ID+")";
+                    ColumnReader.ProductType.TABLE_NAME + "("+ColumnReader.ProductType.COLUMN_NAME_PRODUCT_ID+")";
+
+    private static final String SQL_CREATE_ENTRIES_MODEL =
+            "CREATE TABLE IF NOT EXISTS " + ColumnReader.Model.TABLE_NAME + "(" +
+                    ColumnReader.Model.COLUMN_NAME_MODEL_ID + "INT NOT NULL, " +
+                    ColumnReader.Model.COLUMN_NAME_MODEL_NAME + "TEXT," +
+                    ColumnReader.Brand.COLUMN_NAME_PRODUCT_ID + " INT, " +
+                    "FOREIGN KEY ("+ColumnReader.ProductType.COLUMN_NAME_PRODUCT_ID+ ") REFERENCES"+
+                    ColumnReader.ProductType.TABLE_NAME + "("+ColumnReader.ProductType.COLUMN_NAME_PRODUCT_ID+
+                    ColumnReader.Brand.COLUMN_NAME_BRAND_ID + " INT, " +
+                    "FOREIGN KEY ("+ColumnReader.Brand.COLUMN_NAME_BRAND_ID+ ") REFERENCES"+
+                    ColumnReader.Brand.TABLE_NAME + "("+ColumnReader.ProductType.COLUMN_NAME_PRODUCT_ID+")";
+
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + ColumnReader.ProductType.TABLE_NAME;
