@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.divani.android.handystockmanager.custom.SpinAdapter;
+import com.divani.android.handystockmanager.custom.StringFormatter;
 import com.divani.android.handystockmanager.database.Product_Type;
 import com.divani.android.handystockmanager.database.Products;
 import com.divani.android.handystockmanager.database.StockData;
@@ -149,7 +150,9 @@ public class AddFragment extends Fragment {
 
         /*------------------Adding entry to database----------------*/
 
-        Products p = new Products(prod_type_id, brand_txt, model_txt, price_txt);
+        Log.d("VAUESSS", StringFormatter.toTitleCase(brand_txt) + " " + StringFormatter.toTitleCase(model_txt));
+
+        Products p = new Products(prod_type_id, StringFormatter.toTitleCase(brand_txt), StringFormatter.toTitleCase(model_txt), price_txt);
 
         if(dbHelper.addProducts(p)) {
             Log.d("Adding: ", "Added new product ..");

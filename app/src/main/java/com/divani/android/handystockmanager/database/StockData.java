@@ -23,7 +23,7 @@ public class StockData extends SQLiteOpenHelper {
             "CREATE TABLE IF NOT EXISTS " + Product_Type.TABLE_NAME + " (" +
                     Product_Type.COLUMN_NAME_PRODUCT_TYPE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     Product_Type.COLUMN_NAME_PRODUCT_TYPE_NAME + " TEXT NOT NULL," +
-                    "UNIQUE( " + Product_Type.COLUMN_NAME_PRODUCT_TYPE_NAME + "));";
+                    "UNIQUE( " + Product_Type.COLUMN_NAME_PRODUCT_TYPE_NAME + " COLLATE NOCASE));";
 
     private static final String SQL_CREATE_ENTRIES_PRODUCTS =
             "CREATE TABLE IF NOT EXISTS " + Products.TABLE_NAME + " (" +
@@ -103,15 +103,25 @@ public class StockData extends SQLiteOpenHelper {
 
     public boolean addProduct_Type(Product_Type p) {
 
+        boolean res = false;
+
+        db.beginTransaction();
+
         ContentValues values = new ContentValues();
         values.put(Product_Type.COLUMN_NAME_PRODUCT_TYPE_NAME, p.getProduct_type_name());
 
         long ret = db.insertWithOnConflict(Product_Type.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
 
-        if(ret == -1)
-            return false;
+        if(ret > -1) {
 
-        return true;
+            Log.d("INSERT", "Inserted new Product Type " + ret);
+
+            db.setTransactionSuccessful();
+            res =  true;
+        }
+
+        db.endTransaction();
+        return res;
     }
 
     public Product_Type[] getAllProduct_TypeArr() {
@@ -146,28 +156,49 @@ public class StockData extends SQLiteOpenHelper {
 
     public boolean addProducts(Products p) {
 
-        ContentValues values = new ContentValues();
-        values.put(Products.COLUMN_NAME_PRODUCT_TYPE_ID, p.getP_id());
-        values.put(Products.COLUMN_NAME_BRAND, p.getBrand_name());
-        values.put(Products.COLUMN_NAME_MODEL, p.getModel_name());
-        values.put(Products.COLUMN_NAME_PRICE, p.getPrice());
+        long result = -2;
+        boolean res = false;
 
-        long result = db.insertWithOnConflict(Products.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+        try {
+            db.beginTransaction();
 
-        Log.d("INSERT", "Inserting of products returned " + result);
+            ContentValues values = new ContentValues();
+            values.put(Products.COLUMN_NAME_PRODUCT_TYPE_ID, p.getP_id());
+            values.put(Products.COLUMN_NAME_BRAND, p.getBrand_name());
+            values.put(Products.COLUMN_NAME_MODEL, p.getModel_name());
+            values.put(Products.COLUMN_NAME_PRICE, p.getPrice());
 
-        if(result == -1) {
+            result = db.insertOrThrow(Products.TABLE_NAME, null, values);
+            Log.d("INSERT", "Inserted new products " + result);
 
-            if(updateProducts(p))
-                return true;
+            db.setTransactionSuccessful();
+            res = true;
 
-            return false;
+        } catch (Exception ex) {
+
+            if(db.inTransaction())
+                db.endTransaction();
+
+            Log.d("EXCEPTION", "Caught exception while inserting Products");
+
+            if (result == -2)
+                if (updateProducts(p))
+                    res = true;
+
+        } finally {
+
+            if(db.inTransaction())
+                db.endTransaction();
         }
 
-        return true;
+        return res;
     }
 
     public boolean updateProducts(Products p) {
+
+        boolean res = false;
+
+        db.beginTransaction();
 
         ContentValues cv = new ContentValues();
 
@@ -179,10 +210,14 @@ public class StockData extends SQLiteOpenHelper {
 
         Log.d("UPDATE", "Updating of products returned " + result);
 
-        if(result > 0)
-            return true;
+        if(result > 0) {
+            db.setTransactionSuccessful();
+            res =  true;
+        }
 
-        return false;
+        db.endTransaction();
+
+        return res;
     }
 
     public Products[] getAllProductsArr() {
