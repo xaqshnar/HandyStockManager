@@ -154,6 +154,9 @@ public class AddFragment extends Fragment {
         if(dbHelper.addProducts(p)) {
             Log.d("Adding: ", "Added new product ..");
             resetFields();
+
+            setValuesForBrand(getView());
+            setValuesForModel(getView());
         }
         else
             return false;
@@ -275,7 +278,7 @@ public class AddFragment extends Fragment {
                         setValuesForProductSpinner(getView());
                     }
                     else {
-                        Toast.makeText(DIALOG_VIEW.getContext(), "Failed to add Product Type", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(DIALOG_VIEW.getContext(), "Failed to add. Product Type may already exist", Toast.LENGTH_SHORT).show();
                     }
 
                 }else {

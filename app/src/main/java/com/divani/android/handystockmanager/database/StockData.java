@@ -22,7 +22,8 @@ public class StockData extends SQLiteOpenHelper {
     private static final String SQL_CREATE_ENTRIES_PRODUCT_TYPE =
             "CREATE TABLE IF NOT EXISTS " + Product_Type.TABLE_NAME + " (" +
                     Product_Type.COLUMN_NAME_PRODUCT_TYPE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    Product_Type.COLUMN_NAME_PRODUCT_TYPE_NAME + " TEXT NOT NULL)";
+                    Product_Type.COLUMN_NAME_PRODUCT_TYPE_NAME + " TEXT NOT NULL," +
+                    "UNIQUE( " + Product_Type.COLUMN_NAME_PRODUCT_TYPE_NAME + "));";
 
     private static final String SQL_CREATE_ENTRIES_PRODUCTS =
             "CREATE TABLE IF NOT EXISTS " + Products.TABLE_NAME + " (" +
@@ -31,6 +32,8 @@ public class StockData extends SQLiteOpenHelper {
                     Products.COLUMN_NAME_BRAND + " TEXT NOT NULL, " +
                     Products.COLUMN_NAME_MODEL + " TEXT NOT NULL, " +
                     Products.COLUMN_NAME_PRICE + " TEXT NOT NULL, " +
+                    "UNIQUE( " + Products.COLUMN_NAME_BRAND + ", " +
+                    Products.COLUMN_NAME_MODEL + ", " + Products.COLUMN_NAME_PRODUCT_TYPE_ID + "), " +
                     "FOREIGN KEY (" + Products.COLUMN_NAME_MODEL + ") REFERENCES "
                     + Product_Type.TABLE_NAME +"("+ Product_Type.COLUMN_NAME_PRODUCT_TYPE_ID + "));";
 
@@ -103,7 +106,7 @@ public class StockData extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(Product_Type.COLUMN_NAME_PRODUCT_TYPE_NAME, p.getProduct_type_name());
 
-        long ret = db.insert(Product_Type.TABLE_NAME, null, values);
+        long ret = db.insertWithOnConflict(Product_Type.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
 
         if(ret == -1)
             return false;
@@ -149,12 +152,37 @@ public class StockData extends SQLiteOpenHelper {
         values.put(Products.COLUMN_NAME_MODEL, p.getModel_name());
         values.put(Products.COLUMN_NAME_PRICE, p.getPrice());
 
-        long result = db.insert(Products.TABLE_NAME, null, values);
+        long result = db.insertWithOnConflict(Products.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
 
-        if(result == -1)
+        Log.d("INSERT", "Inserting of products returned " + result);
+
+        if(result == -1) {
+
+            if(updateProducts(p))
+                return true;
+
             return false;
+        }
 
         return true;
+    }
+
+    public boolean updateProducts(Products p) {
+
+        ContentValues cv = new ContentValues();
+
+        cv.put(Products.COLUMN_NAME_PRICE, p.getPrice());
+
+        long result = db.update(Products.TABLE_NAME, cv, Products.COLUMN_NAME_BRAND + "='" + p.getBrand_name()
+                + "' AND " + Products.COLUMN_NAME_MODEL + "='" + p.getModel_name()
+                + "' AND " + Products.COLUMN_NAME_PRODUCT_TYPE_ID + "='" + p.getP_id() + "'" , null); //returns number of rows affected
+
+        Log.d("UPDATE", "Updating of products returned " + result);
+
+        if(result > 0)
+            return true;
+
+        return false;
     }
 
     public Products[] getAllProductsArr() {
