@@ -14,5 +14,9 @@
     <string name="submit_product">Submit</string>
     <string name="add_new_product">+</string>
     <string name="new_product">Enter new product type</string>
+    <string name="submit_bought_btn">Submit</string>
+    <string name="bought_qty_txt">Quantity</string>
+    <string name="sold_qty_txt">Quantity</string>
+    <string name="submit_sold_btn">Submit</string>
 
 </resources>
