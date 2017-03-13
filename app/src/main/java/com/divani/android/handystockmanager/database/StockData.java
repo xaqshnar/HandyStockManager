@@ -37,6 +37,16 @@ public class StockData extends SQLiteOpenHelper {
                     "FOREIGN KEY (" + Products.COLUMN_NAME_MODEL + ") REFERENCES "
                     + Product_Type.TABLE_NAME +"("+ Product_Type.COLUMN_NAME_PRODUCT_TYPE_ID + "));";
 
+    private static final String SQL_CREATE_ENTRIES_STOCK =
+            "CREATE TABLE IF NOT EXISTS " + Stock.TABLE_NAME + " (" +
+                    Stock.COLUMN_NAME_STOCK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    Stock.COLUMN_NAME_PRODUCT_ID + " INTEGER NOT NULL, " +
+                    Stock.COLUMN_NAME_BOUGHT_QTY + " INTEGER NOT NULL, " +
+                    Stock.COLUMN_NAME_SOLD_QTY+ " INTEGER NOT NULL, " +
+                    Stock.COLUMN_NAME_REMAINING_QTY + " INTEGER NOT NULL, " +
+                    "FOREIGN KEY (" + Stock.COLUMN_NAME_PRODUCT_ID + ") REFERENCES "
+                    + Products.TABLE_NAME +"("+ Products.COLUMN_NAME_PRODUCT_ID + "));";
+
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + Product_Type.TABLE_NAME;
 
@@ -88,6 +98,7 @@ public class StockData extends SQLiteOpenHelper {
 
         db.execSQL(SQL_CREATE_ENTRIES_PRODUCT_TYPE);
         db.execSQL(SQL_CREATE_ENTRIES_PRODUCTS);
+        db.execSQL(SQL_CREATE_ENTRIES_STOCK);
     }
 
     @Override
