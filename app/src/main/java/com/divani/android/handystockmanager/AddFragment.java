@@ -1,7 +1,6 @@
 package com.divani.android.handystockmanager;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,19 +16,12 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import com.divani.android.handystockmanager.custom.SpinAdapter;
 import com.divani.android.handystockmanager.custom.StringFormatter;
 import com.divani.android.handystockmanager.database.Product_Type;
 import com.divani.android.handystockmanager.database.Products;
 import com.divani.android.handystockmanager.database.StockData;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.Inflater;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -299,7 +291,6 @@ public class AddFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment AddFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static AddFragment newInstance(String param1, String param2) {
         AddFragment fragment = new AddFragment();
         Bundle args = new Bundle();
@@ -318,7 +309,6 @@ public class AddFragment extends Fragment {
         }
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -353,7 +343,6 @@ public class AddFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 
