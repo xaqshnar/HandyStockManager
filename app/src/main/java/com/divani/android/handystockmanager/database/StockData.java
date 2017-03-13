@@ -24,11 +24,6 @@ public class StockData extends SQLiteOpenHelper {
                     Product_Type.COLUMN_NAME_PRODUCT_TYPE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     Product_Type.COLUMN_NAME_PRODUCT_TYPE_NAME + " TEXT NOT NULL)";
 
-    private static final String SQL_CREATE_ENTRIES_BRAND =
-            "CREATE TABLE IF NOT EXISTS " + Brand.TABLE_NAME + " (" +
-                    Brand.COLUMN_NAME_BRAND_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    Brand.COLUMN_NAME_BRAND_NAME + " TEXT NOT NULL)";
-
     private static final String SQL_CREATE_ENTRIES_PRODUCTS =
             "CREATE TABLE IF NOT EXISTS " + Products.TABLE_NAME + " (" +
                     Products.COLUMN_NAME_PRODUCT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -55,7 +50,7 @@ public class StockData extends SQLiteOpenHelper {
             instance = new StockData(context, DATABASE_NAME, null, DATABASE_VERSION);
 
             openConnection();
-            insertDummyData();
+            //insertDummyData();
         }
         return instance;
     }
@@ -103,12 +98,17 @@ public class StockData extends SQLiteOpenHelper {
 
     /*--------------------------------------Product Type --------------------------------------------------*/
 
-    public void addProduct_Type(Product_Type p) {
+    public boolean addProduct_Type(Product_Type p) {
 
         ContentValues values = new ContentValues();
         values.put(Product_Type.COLUMN_NAME_PRODUCT_TYPE_NAME, p.getProduct_type_name());
 
-        db.insert(Product_Type.TABLE_NAME, null, values);
+        long ret = db.insert(Product_Type.TABLE_NAME, null, values);
+
+        if(ret == -1)
+            return false;
+
+        return true;
     }
 
     public Product_Type[] getAllProduct_TypeArr() {
@@ -141,7 +141,7 @@ public class StockData extends SQLiteOpenHelper {
 
     /*-------------------------------------------Products--------------------------------------------------*/
 
-    public void addProducts(Products p) {
+    public boolean addProducts(Products p) {
 
         ContentValues values = new ContentValues();
         values.put(Products.COLUMN_NAME_PRODUCT_TYPE_ID, p.getP_id());
@@ -149,7 +149,12 @@ public class StockData extends SQLiteOpenHelper {
         values.put(Products.COLUMN_NAME_MODEL, p.getModel_name());
         values.put(Products.COLUMN_NAME_PRICE, p.getPrice());
 
-        db.insert(Products.TABLE_NAME, null, values);
+        long result = db.insert(Products.TABLE_NAME, null, values);
+
+        if(result == -1)
+            return false;
+
+        return true;
     }
 
     public Products[] getAllProductsArr() {
