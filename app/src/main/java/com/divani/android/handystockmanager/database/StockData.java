@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.divani.android.handystockmanager.database.Product_Type;
 import com.divani.android.handystockmanager.database.Products;
@@ -104,10 +105,10 @@ public class StockData extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        db.execSQL(SQL_DELETE_ENTRIES);
-        db.execSQL("DROP TABLE IF EXISTS " + Products.TABLE_NAME);
+        //db.execSQL(SQL_DELETE_ENTRIES);
+        //db.execSQL("DROP TABLE IF EXISTS " + Products.TABLE_NAME);
 
-        onCreate(db);
+        //onCreate(db);
     }
 
     /*--------------------------------------Product Type --------------------------------------------------*/
@@ -262,6 +263,38 @@ public class StockData extends SQLiteOpenHelper {
         return pl;
     }
 
+
+    public Products[] getAllProductsArr(String brand) {
+
+        String selectQuery = "SELECT * FROM " + Products.TABLE_NAME + " WHERE " + Products.COLUMN_NAME_BRAND + " like '" + brand + "'";
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        Products[] pl = new Products[cursor.getCount()];
+
+        int i = 0;
+
+        if (cursor.moveToFirst()) {
+            do {
+
+                Products p = new Products();
+                p.setProduct_id(Integer.parseInt(cursor.getString(0)));
+                p.setP_id(Integer.parseInt(cursor.getString(1)));
+                p.setBrand_name(cursor.getString(2));
+                p.setModel_name(cursor.getString(3));
+                p.setPrice(cursor.getString(4));
+
+                pl[i] = p;
+
+                i++;
+
+            } while (cursor.moveToNext());
+        }
+
+        // return array
+        return pl;
+    }
+
     /*-----------------------------------------------------------------------------*/
     public String[] getDistinctData(String column, String table) {
 
@@ -287,6 +320,24 @@ public class StockData extends SQLiteOpenHelper {
     }
     /*-----------------------------------------------------------------------------*/
 
+    public String[] getDataForSpinner(String column, String table, String key_column, String key) {
+
+        String selectQuery = "SELECT DISTINCT " + column +","+ key_column + " FROM " + table + " WHERE " + key_column + " LIKE " + "'"+key+"'";
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        String[] list = new String[cursor.getCount()+1];
+        list[0] = "Select";
+        int i = 1;
+        if (cursor.moveToFirst()) {
+            do {
+
+                list[i] = cursor.getString(0);
+                i++;
+
+            } while (cursor.moveToNext());
+        }
+        return list;
+    }
+
     public static void insertDummyData() {
 
         //insert dummy values
@@ -303,6 +354,133 @@ public class StockData extends SQLiteOpenHelper {
         instance.addProducts(new Products(2, "Kenstar", "SmartTV", "53000"));
         instance.addProducts(new Products(1, "Moto", "G4", "37000"));
         instance.addProducts(new Products(3, "Lenovo", "Phab+", "28000"));
+
+    }
+
+    public static void addBoughtEntry(Products selected_product, int quantity, String action) {
+        Log.d("Inserting: ", quantity+" Products bought");
+
+        long result = -2;
+        int alreadyBought, stockRemaining, alreadySold;
+        int bought = 0, sold = 0;
+        ContentValues values = new ContentValues();
+        String selectQuery;
+        Cursor cursor;
+
+        selectQuery = "SELECT DISTINCT "+Stock.COLUMN_NAME_BOUGHT_QTY+", "+Stock.COLUMN_NAME_REMAINING_QTY+", "+Stock.COLUMN_NAME_SOLD_QTY+
+                " FROM " + Stock.TABLE_NAME +
+                " WHERE " + Stock.COLUMN_NAME_PRODUCT_ID + " LIKE " + "'"+selected_product.getProduct_id()+"'";
+        cursor = db.rawQuery(selectQuery, null);
+
+        alreadyBought = cursor.getInt(0);
+        stockRemaining = cursor.getInt(1);
+        alreadySold = cursor.getInt(2);
+
+        switch (action) {
+
+            case "bought":
+                bought = quantity;
+                sold = 0;
+
+                if (cursor.getCount() == 0) {
+            /*
+            *   Create new entry in the table
+            * */
+                    try {
+                        Log.d("Adding", "new entry");
+                        db.beginTransaction();
+
+                        values.put(Stock.COLUMN_NAME_PRODUCT_ID, selected_product.getProduct_id());
+                        values.put(Stock.COLUMN_NAME_BOUGHT_QTY, bought);
+                        values.put(Stock.COLUMN_NAME_REMAINING_QTY, bought);
+                        values.put(Stock.COLUMN_NAME_SOLD_QTY, sold);
+
+                        result = db.insertOrThrow(Stock.TABLE_NAME, null, values);
+                        db.setTransactionSuccessful();
+                        db.endTransaction();
+
+                    } catch (Exception ex) {
+
+                        if(db.inTransaction()) {
+                            db.endTransaction();
+                        }
+                    }
+                    return;
+                } else {
+
+                    if (cursor.moveToFirst()) {
+
+                        bought = bought + alreadyBought;
+                        stockRemaining = bought;
+
+                        Log.d("Already Bought ", Integer.toString(alreadyBought));
+                        Log.d("Stock remaining ", Integer.toString(stockRemaining));
+
+                        values.put(Stock.COLUMN_NAME_BOUGHT_QTY, bought);
+                        values.put(Stock.COLUMN_NAME_REMAINING_QTY, stockRemaining);
+                    }
+                }
+
+                break;
+            case "sold":
+                sold = quantity;
+
+                if (cursor.getCount() == 0) {
+                    Toast.makeText(context, "Stock not available", Toast.LENGTH_SHORT).show();
+                    return;
+                } else {
+                    if (cursor.moveToFirst()) {
+
+                        if(stockRemaining == 0) {
+                            Toast.makeText(context, "Stock not available", Toast.LENGTH_SHORT).show();
+                            return;
+
+                        } else if(stockRemaining < sold) {
+                            Toast.makeText(context, "Not enough stock", Toast.LENGTH_SHORT).show();
+                            return;
+                        } else {
+                            bought = alreadyBought - sold;
+                            sold = alreadySold + sold;
+                            stockRemaining = bought;
+
+                            Log.d("Already Sold ", Integer.toString(alreadySold));
+                            Log.d("Stock remaining ", Integer.toString(stockRemaining));
+                            Log.d("Stock Sold ", Integer.toString(sold));
+
+                            values.put(Stock.COLUMN_NAME_BOUGHT_QTY, bought);
+                            values.put(Stock.COLUMN_NAME_REMAINING_QTY, stockRemaining);
+                            values.put(Stock.COLUMN_NAME_SOLD_QTY, sold);
+
+                        }
+                    }
+                }
+
+                break;
+        }
+
+        if (cursor.getCount() > 0){
+
+            /*
+            *  Update existing entry in the table
+            * */
+
+            try {
+                Log.d("Updating", "existing entry");
+                db.beginTransaction();
+
+                result = db.update(Stock.TABLE_NAME, values, Stock.COLUMN_NAME_PRODUCT_ID + "='" + selected_product.getProduct_id() + "'", null);
+
+                if (result > 0) {
+                    db.setTransactionSuccessful();
+                    db.endTransaction();
+                }
+            }catch (Exception ex) {
+                if(db.inTransaction()) {
+                    db.endTransaction();
+                }
+            }
+
+        }
 
     }
 
